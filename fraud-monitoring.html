@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fraud & Scam Monitoring — AI Engine</title>
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+  <div class="app-container">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <span style="font-size:1.5rem;">🛡️</span>
+        <span class="gradient-text" style="font-weight:800;">Fraud Shield</span>
+      </div>
+      <ul class="sidebar-menu">
+        <li class="menu-item"><a href="admin-dashboard.html">📊 Overview</a></li>
+        <li class="menu-item active"><a href="fraud-monitoring.html">�️ Fraud Monitoring</a></li>
+        <li class="menu-item"><a href="settings.html">⚙️ Settings & DB Backup</a></li>
+      </ul>
+    </aside>
+
+    <main class="main-content">
+      <div class="top-bar">
+        <h1>Automated Fraud & Scam Risk Monitoring System</h1>
+      </div>
+
+      <div class="glass-card" style="margin-bottom:2rem;">
+        <h3 style="font-size:1.2rem; margin-bottom:1rem; color:var(--accent-error);">⚠️ Suspicious Internship Audit Queue</h3>
+
+        <div id="fraud-queue-container" style="display:flex; flex-direction:column; gap:1.25rem;">
+          <!-- Rendered via JS -->
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="js/seed-data.js"></script>
+  <script src="js/database.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      setTimeout(async () => {
+        const flags = await window.dbManager.getAll('fraudFlags');
+        const container = document.getElementById('fraud-queue-container');
+
+        container.innerHTML = flags.map(flag => `
+          <div class="glass-card" style="border-color:var(--accent-error);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+              <div>
+                <h3 style="font-size:1.2rem; color:var(--accent-error);">${Utils.escapeHTML(flag.companyName)}</h3>
+                <div style="color:var(--text-secondary); font-size:0.9rem;">Flagged Date: ${flag.flaggedDate}</div>
+              </div>
+              <span class="badge badge-error" style="font-size:1.1rem; padding:0.4rem 0.9rem;">Risk Score: ${flag.riskScore}% (${flag.riskLevel})</span>
+            </div>
+
+            <div style="background:rgba(0,0,0,0.3); padding:1rem; border-radius:var(--radius-sm); margin-bottom:1rem;">
+              <h4 style="font-size:0.88rem; color:var(--accent-warning); margin-bottom:0.4rem;">Risk Factors Detected:</h4>
+              <ul style="color:var(--text-secondary); font-size:0.9rem; padding-left:1.2rem;">
+                ${flag.reasons.map(r => `<li>${Utils.escapeHTML(r)}</li>`).join('')}
+              </ul>
+            </div>
+
+            <div style="display:flex; gap:0.75rem;">
+              <button onclick="Utils.showToast('Listing Suspended & Removed!', 'error')" class="btn btn-primary" style="background:var(--accent-error);">Suspend Employer Account</button>
+              <button onclick="Utils.showToast('Listing Approved after audit', 'info')" class="btn btn-secondary">Dismiss Alert</button>
+            </div>
+          </div>
+        `).join('');
+      }, 300);
+    });
+  </script>
+</body>
+</html>

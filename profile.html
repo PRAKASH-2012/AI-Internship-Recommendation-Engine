@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Profile — AI Internship Engine</title>
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+  <div class="app-container">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <span style="font-size:1.5rem;">🤖</span>
+        <span class="gradient-text" style="font-weight:800;">AI Internship Engine</span>
+      </div>
+      <ul class="sidebar-menu">
+        <li class="menu-item"><a href="student-dashboard.html">📊 Dashboard</a></li>
+        <li class="menu-item"><a href="internships.html">💼 Internships Marketplace</a></li>
+        <li class="menu-item"><a href="recommendations.html">🎯 AI Recommendation Feed</a></li>
+        <li class="menu-item"><a href="skill-gap.html">⚡ Skill Gap Analyzer</a></li>
+        <li class="menu-item"><a href="career.html">�️ Career Roadmap</a></li>
+        <li class="menu-item"><a href="resume-analyzer.html">📄 Resume Optimizer</a></li>
+        <li class="menu-item"><a href="applications.html">📝 Applications Tracker</a></li>
+        <li class="menu-item active"><a href="profile.html">👤 Student Profile</a></li>
+      </ul>
+    </aside>
+
+    <main class="main-content">
+      <div class="top-bar">
+        <h1>Student Profile Management</h1>
+        <div style="display:flex; gap:0.5rem;">
+          <button id="btn-export-profile" class="btn btn-secondary">📥 Export</button>
+          <button id="btn-backup-profile" class="btn btn-secondary">💾 Backup</button>
+          <button id="btn-save-profile" class="btn btn-primary">Save Profile Changes</button>
+        </div>
+      </div>
+
+      <div class="glass-card" style="margin-bottom:2rem;">
+        <h3 style="margin-bottom:1.25rem;">Personal Information</h3>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1rem;">
+          <div class="form-group">
+            <label class="form-label">Full Name</label>
+            <input type="text" id="prof-name" class="form-input" value="PRAKASH" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email Address</label>
+            <input type="email" id="prof-email" class="form-input" value="abc123@gmail.com" disabled />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Phone Number</label>
+            <input type="text" id="prof-phone" class="form-input" value="9876543210" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Current Location</label>
+            <input type="text" id="prof-location" class="form-input" value="TAMILNADU, INDIA" />
+          </div>
+        </div>
+      </div>
+
+      <div class="glass-card" style="margin-bottom:2rem;">
+        <h3 style="margin-bottom:1.25rem;">Education & Academic Details</h3>
+        <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:1rem;">
+          <div class="form-group">
+            <label class="form-label">Degree</label>
+            <input type="text" id="prof-degree" class="form-input" value="B.Tech. Computer Science And Business Systems" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Branch / Major</label>
+            <input type="text" id="prof-branch" class="form-input" value="Software Engineering" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Current CGPA</label>
+            <input type="number" step="0.01" id="prof-cgpa" class="form-input" value="8.85" />
+          </div>
+        </div>
+      </div>
+
+      <div class="glass-card">
+        <h3 style="margin-bottom:1.25rem;">Technical Skills</h3>
+        <div class="form-group">
+          <label class="form-label">Skills (Comma Separated)</label>
+          <input type="text" id="prof-skills" class="form-input" value="Java, JavaScript, Python, SQL, Git, HTML5, CSS3, REST API" />
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="js/seed-data.js"></script>
+  <script src="js/database.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/export.js"></script>
+  <script src="js/backup.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    // Export Profile
+    document.getElementById('btn-export-profile').addEventListener('click', async () => {
+      const student = await window.dbManager.get('students', 'std-1');
+      const data = JSON.stringify(student, null, 2);
+      const blob = new Blob([data], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `profile-${Date.now()}.json`;
+      a.click();
+      Utils.showToast('Profile exported successfully!', 'success');
+    });
+
+    // Backup Profile
+    document.getElementById('btn-backup-profile').addEventListener('click', () => {
+      if (window.backupManager) {
+        window.backupManager.createBackup();
+        Utils.showToast('Profile backed up!', 'success');
+      }
+    });
+
+    document.getElementById('btn-save-profile').addEventListener('click', async () => {
+      const student = await window.dbManager.get('students', 'std-1');
+      if (student) {
+        student.name = document.getElementById('prof-name').value;
+        student.phone = document.getElementById('prof-phone').value;
+        student.location = document.getElementById('prof-location').value;
+        student.education.degree = document.getElementById('prof-degree').value;
+        student.education.branch = document.getElementById('prof-branch').value;
+        student.education.cgpa = parseFloat(document.getElementById('prof-cgpa').value) || 3.5;
+        student.skills = document.getElementById('prof-skills').value.split(',').map(s => s.trim());
+
+        await window.dbManager.put('students', student);
+        Utils.showToast('Profile updated successfully!', 'success');
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Saved Internships — AI Engine</title>
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/internship.css">
+</head>
+<body>
+  <div class="app-container">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <span style="font-size:1.5rem;">🤖</span>
+        <span class="gradient-text" style="font-weight:800;">AI Internship Engine</span>
+      </div>
+      <ul class="sidebar-menu">
+        <li class="menu-item"><a href="student-dashboard.html">📊 Dashboard</a></li>
+        <li class="menu-item"><a href="internships.html">💼 Internships Marketplace</a></li>
+        <li class="menu-item active"><a href="saved.html">⭐ Saved Internships</a></li>
+        <li class="menu-item"><a href="compare.html">⚖️ Compare Internships</a></li>
+      </ul>
+    </aside>
+
+    <main class="main-content">
+      <div class="top-bar">
+        <h1>Saved & Bookmarked Opportunities</h1>
+        <div style="display:flex; gap:0.5rem;">
+          <button id="btn-export-saved" class="btn btn-secondary">📥 Export</button>
+          <button id="btn-sort-saved" class="btn btn-secondary">↑↓ Sort by Match</button>
+        </div>
+      </div>
+
+      <div id="saved-list-container" class="internship-list">
+        <!-- Rendered via JS -->
+      </div>
+    </main>
+  </div>
+
+  <script src="js/seed-data.js"></script>
+  <script src="js/database.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/export.js"></script>
+  <script src="js/recommendation-engine.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    // Export Saved
+    document.getElementById('btn-export-saved').addEventListener('click', async () => {
+      const saved = await window.dbManager.filter('savedInternships', s => s.studentId === 'std-1');
+      const csvContent = 'Internship ID,Title,Saved Date\n' + 
+        saved.map(s => `${s.internshipId},"AI Internship (${s.internshipId})",${s.savedDate || 'N/A'}`).join('\n');
+      
+      const blob = new Blob([csvContent], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `saved-internships-${Date.now()}.csv`;
+      a.click();
+      Utils.showToast('Saved internships exported!', 'success');
+    });
+
+    // Sort by Match Score
+    document.getElementById('btn-sort-saved').addEventListener('click', () => {
+      Utils.showToast('Saved internships sorted by AI match score (descending)', 'info');
+    });
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      setTimeout(async () => {
+        const saved = await window.dbManager.filter('savedInternships', s => s.studentId === 'std-1');
+        const container = document.getElementById('saved-list-container');
+
+        if (saved.length === 0) {
+          container.innerHTML = `<div class="glass-card">No saved internships yet. Bookmark roles from the marketplace!</div>`;
+          return;
+        }
+
+        const items = [];
+        for (const item of saved) {
+          const int = await window.dbManager.get('internships', item.internshipId);
+          if (int) items.push(int);
+        }
+
+        container.innerHTML = items.map(item => `
+          <div class="glass-card internship-card">
+            <div>
+              <h3 style="font-size:1.2rem;">${Utils.escapeHTML(item.role)}</h3>
+              <div style="color:var(--text-secondary); font-size:0.9rem;">${Utils.escapeHTML(item.companyName)} • ${Utils.escapeHTML(item.location)}</div>
+              <div style="font-weight:600; color:var(--accent-cyan); margin-top:0.4rem;">${item.stipend}</div>
+            </div>
+            <a href="internship-details.html?id=${item.id}" class="btn btn-primary">Apply Now</a>
+          </div>
+        `).join('');
+      }, 300);
+    });
+  </script>
+</body>
+</html>

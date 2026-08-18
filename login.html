@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In — AI Internship Recommendation Engine</title>
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/auth.css">
+  <link rel="stylesheet" href="css/animations.css">
+</head>
+<body>
+  <div class="auth-container">
+    <div style="position:absolute; top:1rem; right:1rem; display:flex; gap:0.5rem; align-items:center;">
+      <select class="lang-select form-select" style="padding:0.4rem 0.8rem; font-size:0.85rem;">
+        <option value="en">English (EN)</option>
+        <option value="tn">தமிழ் (TN)</option>
+        <option value="hi">हिन्दी (HI)</option>
+      </select>
+      <button class="theme-toggle-btn btn-icon" title="Toggle Theme">🌙</button>
+    </div>
+
+    <div class="glass-card auth-card animate-slide-in">
+      <div class="auth-header">
+        <span style="font-size:2.5rem;">🤖</span>
+        <h2 style="font-size:1.8rem; margin-top:0.5rem;">Welcome Back</h2>
+        <p style="color:var(--text-secondary); font-size:0.9rem;">Sign in to your AI Internship Engine account</p>
+      </div>
+
+      <div style="margin-bottom:1.5rem;">
+        <span class="form-label">Quick Demo Account One-Click Login:</span>
+        <div class="demo-account-pills">
+          <div class="demo-pill" onclick="authController.switchDemoRole('student')">🎓 Student</div>
+          <div class="demo-pill" onclick="authController.switchDemoRole('company')">🏢 Recruiter</div>
+          <div class="demo-pill" onclick="authController.switchDemoRole('admin')">⚙️ Admin</div>
+        </div>
+      </div>
+
+      <form id="login-form">
+        <div class="form-group">
+          <label class="form-label">Email Address</label>
+          <input type="email" id="login-email" class="form-input" value="abc@123gmail.com" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input type="password" id="login-password" class="form-input" value="••••••••••••" required />
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; font-size:0.85rem;">
+          <label style="display:flex; align-items:center; gap:0.4rem; color:var(--text-secondary); cursor:pointer;">
+            <input type="checkbox" checked /> Remember me
+          </label>
+          <a href="forgot-password.html">Forgot Password?</a>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%;">Sign In</button>
+      </form>
+
+      <div style="margin-top:1.5rem; display:flex; gap:0.75rem;">
+        <button type="button" id="btn-voice-login" class="btn btn-secondary" style="flex:1; font-size:0.85rem;" title="Use voice for login">🎙️ Voice Login</button>
+        <button type="button" id="btn-biometric-login" class="btn btn-secondary" style="flex:1; font-size:0.85rem;" title="Use biometric authentication">👆 Biometric</button>
+      </div>
+
+      <div style="text-align:center; margin-top:1.5rem; font-size:0.9rem; color:var(--text-secondary);">
+        Don't have an account? <a href="register.html">Register Now</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/seed-data.js"></script>
+  <script src="js/database.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/voice-search.js"></script>
+  <script src="js/translations.js"></script>
+  <script>
+    document.getElementById('login-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const email = document.getElementById('login-email').value;
+      authController.login({ id: 'usr-student-1', role: 'student', name: 'PRAKASH', email });
+      setTimeout(() => window.location.href = 'student-dashboard.html', 500);
+    });
+
+    // Voice Login
+    document.getElementById('btn-voice-login').addEventListener('click', () => {
+      if (window.voiceSearch) {
+        window.voiceSearch.startListening((transcript) => {
+          if (transcript.toLowerCase().includes('student')) {
+            authController.switchDemoRole('student');
+          } else if (transcript.toLowerCase().includes('company')) {
+            authController.switchDemoRole('company');
+          } else if (transcript.toLowerCase().includes('admin')) {
+            authController.switchDemoRole('admin');
+          } else {
+            Utils.showToast('Say "student", "company", or "admin" to login', 'info');
+          }
+        });
+      }
+    });
+
+    // Biometric Login
+    document.getElementById('btn-biometric-login').addEventListener('click', () => {
+      if (window.PublicKeyCredential) {
+        Utils.showToast('🔐 Biometric authentication available on modern browsers', 'success');
+      } else {
+        Utils.showToast('Biometric authentication not supported in this browser', 'warning');
+      }
+    });
+  </script>
+</body>
+</html>

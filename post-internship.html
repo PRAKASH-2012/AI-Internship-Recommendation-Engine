@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Post New Internship — AI Engine</title>
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+  <div class="app-container">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <span style="font-size:1.5rem;">🏢</span>
+        <span class="gradient-text" style="font-weight:800;">Recruiter Portal</span>
+      </div>
+      <ul class="sidebar-menu">
+        <li class="menu-item"><a href="company-dashboard.html">📊 Dashboard</a></li>
+        <li class="menu-item active"><a href="post-internship.html">➕ Post Internship</a></li>
+        <li class="menu-item"><a href="candidates.html">🎯 AI Candidate Ranking</a></li>
+      </ul>
+    </aside>
+
+    <main class="main-content">
+      <div class="top-bar">
+        <h1>Post New Internship Opportunity</h1>
+      </div>
+
+      <div class="glass-card">
+        <form id="post-internship-form">
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1rem;">
+            <div class="form-group">
+              <label class="form-label">Internship Title / Role</label>
+              <input type="text" id="post-role" class="form-input" placeholder="e.g. Backend Software Engineer Intern" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Work Mode</label>
+              <select id="post-workmode" class="form-select">
+                <option value="Remote">Remote</option>
+                <option value="Hybrid">Hybrid</option>
+                <option value="Onsite">Onsite</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Location</label>
+              <input type="text" id="post-location" class="form-input" placeholder="e.g. San Francisco, CA" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Stipend Amount ($ / month)</label>
+              <input type="text" id="post-stipend" class="form-input" placeholder="e.g. $2,500 / month" required />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Required Skills (Comma Separated)</label>
+            <input type="text" id="post-skills" class="form-input" placeholder="Java, SQL, REST API, Git" required />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Role Description</label>
+            <textarea id="post-desc" class="form-textarea" rows="4" placeholder="Describe the internship duties and learning scope..." required></textarea>
+          </div>
+
+          <button type="submit" class="btn btn-primary" style="width:100%;">Post Internship & Run Scam Check</button>
+        </form>
+      </div>
+    </main>
+  </div>
+
+  <script src="js/seed-data.js"></script>
+  <script src="js/database.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/fraud-detection.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    document.getElementById('post-internship-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const role = document.getElementById('post-role').value;
+      const workMode = document.getElementById('post-workmode').value;
+      const location = document.getElementById('post-location').value;
+      const stipend = document.getElementById('post-stipend').value;
+      const skills = document.getElementById('post-skills').value.split(',').map(s => s.trim());
+      const description = document.getElementById('post-desc').value;
+
+      const newInt = {
+        id: Utils.generateId('int'),
+        companyId: 'cmp-1',
+        companyName: 'TechPulse Labs',
+        role,
+        workMode,
+        location,
+        stipend,
+        stipendNumeric: parseInt(stipend.replace(/[^0-9]/g, '')) || 2000,
+        requiredSkills: skills,
+        description,
+        status: 'Active',
+        isVerified: true
+      };
+
+      // Run Fraud Check
+      const scamCheck = window.fraudDetector.analyzeListing(newInt, { isVerified: true });
+      newInt.riskScore = scamCheck.riskScore;
+      newInt.riskLevel = scamCheck.riskLevel;
+
+      await window.dbManager.put('internships', newInt);
+
+      if (scamCheck.riskScore >= 70) {
+        Utils.showToast(`Listing flagged for review due to risk score ${scamCheck.riskScore}%`, 'warning');
+      } else {
+        Utils.showToast('Internship posted successfully!', 'success');
+      }
+
+      setTimeout(() => window.location.href = 'company-dashboard.html', 1000);
+    });
+  </script>
+</body>
+</html>

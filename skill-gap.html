@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Skill Gap Analysis — AI Engine</title>
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+  <div class="app-container">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <span style="font-size:1.5rem;">🤖</span>
+        <span class="gradient-text" style="font-weight:800;">AI Internship Engine</span>
+      </div>
+      <ul class="sidebar-menu">
+        <li class="menu-item"><a href="student-dashboard.html">📊 Dashboard</a></li>
+        <li class="menu-item"><a href="internships.html">💼 Internships Marketplace</a></li>
+        <li class="menu-item"><a href="recommendations.html">🎯 AI Feed</a></li>
+        <li class="menu-item active"><a href="skill-gap.html">⚡ Skill Gap Analyzer</a></li>
+        <li class="menu-item"><a href="learning-roadmap.html">📚 Learning Roadmap</a></li>
+      </ul>
+    </aside>
+
+    <main class="main-content">
+      <div class="top-bar">
+        <h1>Skill Gap Analysis</h1>
+        <button id="btn-voice-search" class="btn btn-secondary">🎙 Voice Search</button>
+      </div>
+
+      <div class="glass-card" style="margin-bottom:2rem;">
+        <h3 style="font-size:1.2rem; margin-bottom:1rem;">Select Target Opportunity to Compare</h3>
+        <select id="gap-internship-select" class="form-select" style="max-width:500px;">
+          <option value="int-101">Full Stack Software Engineer Intern — TechPulse Labs</option>
+          <option value="int-102">Cloud Engineering & DevOps Intern — CloudScale Innovations</option>
+          <option value="int-103">Data Science & Machine Learning Intern — DataVibe Analytics</option>
+        </select>
+      </div>
+
+      <div id="gap-results" style="display:grid; grid-template-columns: 1fr 1fr; gap:2rem;">
+        <!-- Rendered via JS -->
+      </div>
+    </main>
+  </div>
+
+  <script src="js/seed-data.js"></script>
+  <script src="js/database.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/skill-engine.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/voice-search.js"></script>
+  <script src="js/analytics.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    // Voice Search
+    document.getElementById('btn-voice-search').addEventListener('click', () => {
+      if (window.voiceSearch) {
+        window.voiceSearch.startListening((transcript) => {
+          const select = document.getElementById('gap-internship-select');
+          const options = Array.from(select.options);
+          const match = options.find(opt => opt.text.toLowerCase().includes(transcript.toLowerCase()));
+          if (match) {
+            select.value = match.value;
+            evaluateGap();
+            Utils.showToast(`Found: ${match.text}`, 'success');
+          } else {
+            Utils.showToast(`No internship found for "${transcript}"`, 'warning');
+          }
+        });
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const select = document.getElementById('gap-internship-select');
+      select.addEventListener('change', () => evaluateGap());
+
+      setTimeout(() => evaluateGap(), 300);
+    });
+
+    async function evaluateGap() {
+      const intId = document.getElementById('gap-internship-select').value;
+      const student = await window.dbManager.get('students', 'std-1');
+      const internship = await window.dbManager.get('internships', intId);
+
+      if (student && internship) {
+        const gap = window.skillEngine.analyzeSkillGap(student.skills, internship.requiredSkills);
+        const container = document.getElementById('gap-results');
+
+        container.innerHTML = `
+          <div class="glass-card">
+            <h3 style="font-size:1.1rem; margin-bottom:1rem; color:var(--accent-success);">✓ Acquired Matching Skills</h3>
+            <div style="display:flex; flex-wrap:wrap; gap:0.5rem;">
+              ${gap.matchedSkills.map(s => `<span class="badge badge-success" style="font-size:0.85rem; padding:0.4rem 0.8rem;">${Utils.escapeHTML(s)}</span>`).join('')}
+            </div>
+          </div>
+
+          <div class="glass-card">
+            <h3 style="font-size:1.1rem; margin-bottom:1rem; color:var(--accent-warning);">⚠ Skill Gaps to Bridge (${100 - gap.gapScore}% Gap)</h3>
+            <div style="display:flex; flex-wrap:wrap; gap:0.5rem; margin-bottom:1.5rem;">
+              ${gap.missingSkills.map(s => `<span class="badge badge-warning" style="font-size:0.85rem; padding:0.4rem 0.8rem;">${Utils.escapeHTML(s)}</span>`).join('')}
+            </div>
+            ${gap.missingSkills.length > 0 ? `
+              <a href="learning-roadmap.html?skill=${encodeURIComponent(gap.missingSkills[0])}" class="btn btn-primary" style="width:100%;">
+                Generate Roadmap for ${gap.missingSkills[0]} →
+              </a>
+            ` : '<div style="color:var(--accent-success);">You have 100% skill match for this role!</div>'}
+          </div>
+        `;
+      }
+    }
+  </script>
+</body>
+</html>

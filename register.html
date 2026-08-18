@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Account — AI Internship Engine</title>
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/auth.css">
+</head>
+<body>
+  <div class="auth-container">
+    <div class="glass-card auth-card">
+      <div class="auth-header">
+        <h2 style="font-size:1.8rem;">Create Your Account</h2>
+        <p style="color:var(--text-secondary); font-size:0.9rem;">Join thousands of students and hiring managers</p>
+      </div>
+      <form id="register-form">
+        <div class="form-group">
+          <label class="form-label">Full Name</label>
+          <input type="text" id="reg-name" class="form-input" placeholder="e.g. PRAKASH" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email Address</label>
+          <input type="email" id="reg-email" class="form-input" placeholder="name@domain.com" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Select Account Role</label>
+          <select id="reg-role" class="form-select">
+            <option value="student">🎓 Student / Candidate</option>
+            <option value="company">🏢 Company / Recruiter</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input type="password" id="reg-pass" class="form-input" required />
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%;">Complete Registration</button>
+      </form>
+      <div style="text-align:center; margin-top:1.5rem; font-size:0.9rem; color:var(--text-secondary);">
+        Already have an account? <a href="login.html">Sign In</a>
+      </div>
+    </div>
+  </div>
+  <script src="js/seed-data.js"></script>
+  <script src="js/database.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    document.getElementById('register-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const role = document.getElementById('reg-role').value;
+      window.location.href = 'verify-account.html?role=' + role;
+    });
+  </script>
+</body>
+</html>

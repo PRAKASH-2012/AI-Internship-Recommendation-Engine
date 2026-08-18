@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Account Verification OTP Simulation</title>
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/auth.css">
+</head>
+<body>
+  <div class="auth-container">
+    <div class="glass-card auth-card" style="text-align:center;">
+      <div class="auth-header">
+        <span style="font-size:2.5rem;">🔑</span>
+        <h2 style="font-size:1.6rem; margin-top:0.5rem;">Verify Your Account</h2>
+        <p style="color:var(--text-secondary); font-size:0.88rem;">Enter 6-digit simulated verification code sent to your email.</p>
+      </div>
+
+      <div style="display:flex; gap:0.5rem; justify-content:center; margin:1.5rem 0;">
+        <input type="text" class="form-input" style="width:45px; text-align:center; font-size:1.4rem;" value="8" />
+        <input type="text" class="form-input" style="width:45px; text-align:center; font-size:1.4rem;" value="4" />
+        <input type="text" class="form-input" style="width:45px; text-align:center; font-size:1.4rem;" value="9" />
+        <input type="text" class="form-input" style="width:45px; text-align:center; font-size:1.4rem;" value="2" />
+        <input type="text" class="form-input" style="width:45px; text-align:center; font-size:1.4rem;" value="0" />
+        <input type="text" class="form-input" style="width:45px; text-align:center; font-size:1.4rem;" value="1" />
+      </div>
+
+      <button id="btn-confirm-otp" class="btn btn-primary" style="width:100%;">Verify & Continue</button>
+    </div>
+  </div>
+
+  <script src="js/storage.js"></script>
+  <script src="js/utils.js"></script>
+  <script>
+    document.getElementById('btn-confirm-otp').addEventListener('click', () => {
+      Utils.showToast('Account verified successfully!', 'success');
+      setTimeout(() => window.location.href = 'student-dashboard.html', 1000);
+    });
+  </script>
+</body>
+</html>

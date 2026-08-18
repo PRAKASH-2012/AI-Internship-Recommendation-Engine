@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Compare Internships — AI Engine</title>
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+  <div class="app-container">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <span style="font-size:1.5rem;">🤖</span>
+        <span class="gradient-text" style="font-weight:800;">AI Internship Engine</span>
+      </div>
+      <ul class="sidebar-menu">
+        <li class="menu-item"><a href="student-dashboard.html">📊 Dashboard</a></li>
+        <li class="menu-item"><a href="internships.html">💼 Internships Marketplace</a></li>
+        <li class="menu-item active"><a href="compare.html">⚖️ Compare Internships</a></li>
+      </ul>
+    </aside>
+
+    <main class="main-content">
+      <div class="top-bar">
+        <h1>Side-by-Side Internship Comparison</h1>
+      </div>
+      <div class="glass-card" style="overflow-x:auto; padding:1rem 1rem 0 1rem;">
+        <div style="display:flex; gap:12px; align-items:center; margin-bottom:12px; flex-wrap:wrap;">
+          <label style="font-weight:600;">Student:</label>
+          <select id="student-select"></select>
+
+          <label style="font-weight:600;">Internship A:</label>
+          <select id="internship-a-select"></select>
+
+          <label style="font-weight:600;">Internship B:</label>
+          <select id="internship-b-select"></select>
+
+          <button id="compare-run" class="btn btn-primary">Compare</button>
+        </div>
+
+        <table id="compare-table" style="width:100%; border-collapse:collapse; text-align:left;">
+          <thead>
+            <tr style="border-bottom:1px solid var(--border-color); color:var(--accent-cyan);">
+              <th style="padding:1rem;">Feature / Metric</th>
+              <th style="padding:1rem;" id="col-a-title">Internship A</th>
+              <th style="padding:1rem;" id="col-b-title">Internship B</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom:1px solid var(--border-color);">
+              <td style="padding:1rem; font-weight:600;">AI Match Score</td>
+              <td style="padding:1rem;" id="score-a">—</td>
+              <td style="padding:1rem;" id="score-b">—</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border-color);">
+              <td style="padding:1rem; font-weight:600;">Stipend</td>
+              <td style="padding:1rem;" id="stipend-a">—</td>
+              <td style="padding:1rem;" id="stipend-b">—</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border-color);">
+              <td style="padding:1rem; font-weight:600;">Work Mode</td>
+              <td style="padding:1rem;" id="mode-a">—</td>
+              <td style="padding:1rem;" id="mode-b">—</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border-color);">
+              <td style="padding:1rem; font-weight:600;">Duration</td>
+              <td style="padding:1rem;" id="duration-a">—</td>
+              <td style="padding:1rem;" id="duration-b">—</td>
+            </tr>
+            <tr>
+              <td style="padding:1rem; font-weight:600;">Required Skills</td>
+              <td style="padding:1rem;" id="skills-a">—</td>
+              <td style="padding:1rem;" id="skills-b">—</td>
+            </tr>
+            <tr>
+              <td style="padding:1rem; font-weight:600;">Why / Notes</td>
+              <td style="padding:1rem;" id="why-a">—</td>
+              <td style="padding:1rem;" id="why-b">—</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+
+  <script src="js/storage.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/seed-data.js"></script>
+  <script src="js/recommendation-engine.js"></script>
+  <script src="js/compare.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

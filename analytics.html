@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Platform Analytics — AI Engine</title>
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+  <div class="app-container">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <span style="font-size:1.5rem;">📈</span>
+        <span class="gradient-text" style="font-weight:800;">Analytics Engine</span>
+      </div>
+      <ul class="sidebar-menu">
+        <li class="menu-item"><a href="admin-dashboard.html">📊 Overview</a></li>
+        <li class="menu-item active"><a href="analytics.html">📈 Platform Analytics</a></li>
+        <li class="menu-item"><a href="settings.html">⚙️ Settings & DB Backup</a></li>
+      </ul>
+    </aside>
+
+    <main class="main-content">
+      <div class="top-bar">
+        <h1>Platform Growth & Industry Skill Demand Analytics</h1>
+      </div>
+
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:2rem;">
+        <div class="glass-card">
+          <h3 style="font-size:1.1rem; margin-bottom:1rem;">Top Demanded Technical Skills</h3>
+          <canvas id="skills-demand-chart" style="width:100%; height:220px;"></canvas>
+        </div>
+
+        <div class="glass-card">
+          <h3 style="font-size:1.1rem; margin-bottom:1rem;">Work Mode Distribution</h3>
+          <div id="workmode-donut-chart"></div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="js/seed-data.js"></script>
+  <script src="js/database.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/analytics.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      setTimeout(() => {
+        window.analyticsEngine.renderBarChart('skills-demand-chart', ['Java', 'Python', 'SQL', 'React', 'Docker'], [42, 38, 35, 28, 20], '#6366f1');
+        window.analyticsEngine.renderDonutChart('workmode-donut-chart', [
+          { label: 'Remote Opportunities', value: 28, color: '#06b6d4' },
+          { label: 'Hybrid Work', value: 14, color: '#6366f1' },
+          { label: 'Onsite Location', value: 8, color: '#ec4899' }
+        ]);
+      }, 300);
+    });
+  </script>
+</body>
+</html>

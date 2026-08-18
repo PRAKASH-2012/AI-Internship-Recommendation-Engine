@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Candidate Match Ranking — AI Engine</title>
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+  <div class="app-container">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <span style="font-size:1.5rem;">🏢</span>
+        <span class="gradient-text" style="font-weight:800;">Recruiter Portal</span>
+      </div>
+      <ul class="sidebar-menu">
+        <li class="menu-item"><a href="company-dashboard.html">📊 Dashboard</a></li>
+        <li class="menu-item"><a href="post-internship.html">➕ Post Internship</a></li>
+        <li class="menu-item active"><a href="candidates.html">🎯 AI Candidate Ranking</a></li>
+      </ul>
+    </aside>
+
+    <main class="main-content">
+      <div class="top-bar">
+        <h1>AI Candidate Match Ranking</h1>
+        <div style="display:flex; gap:0.5rem;">
+          <button id="btn-export-candidates" class="btn btn-secondary">📥 Export</button>
+          <button id="btn-analytics" class="btn btn-secondary">📊 Analytics</button>
+        </div>
+      </div>
+
+      <div id="candidates-list-container" style="display:flex; flex-direction:column; gap:1.25rem;">
+        <!-- Rendered via JS -->
+      </div>
+    </main>
+  </div>
+
+  <script src="js/seed-data.js"></script>
+  <script src="js/database.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/recommendation-engine.js"></script>
+  <script src="js/candidate-matching.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/export.js"></script>
+  <script src="js/analytics.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    // Export Candidates
+    document.getElementById('btn-export-candidates').addEventListener('click', async () => {
+      const internship = await window.dbManager.get('internships', 'int-101');
+      const students = await window.dbManager.getAll('students');
+      const ranked = window.candidateMatcher.rankCandidatesForInternship(internship, students);
+      
+      const csvContent = 'Name,Email,Skills,Match Score,Status\n' + 
+        ranked.map(c => `${c.name},${c.email},"${(c.skills || []).join(', ')}",${c.matchScore}%,Pending`).join('\n');
+      
+      const blob = new Blob([csvContent], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `candidates-${Date.now()}.csv`;
+      a.click();
+      Utils.showToast('Candidates exported as CSV!', 'success');
+    });
+
+    // Analytics
+    document.getElementById('btn-analytics').addEventListener('click', () => {
+      Utils.showToast('📊 Candidate distribution: 45% Software Dev, 30% DevOps, 25% Data Science', 'info');
+    });
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      setTimeout(async () => {
+        const internship = await window.dbManager.get('internships', 'int-101');
+        const students = await window.dbManager.getAll('students');
+
+        if (internship && students.length > 0) {
+          const ranked = window.candidateMatcher.rankCandidatesForInternship(internship, students);
+          const container = document.getElementById('candidates-list-container');
+
+          container.innerHTML = ranked.map(c => `
+            <div class="glass-card" style="display:flex; justify-content:space-between; align-items:center;">
+              <div>
+                <h3 style="font-size:1.2rem;">${Utils.escapeHTML(c.name)}</h3>
+                <div style="color:var(--text-secondary); font-size:0.9rem;">${Utils.escapeHTML(c.education?.degree)} • CGPA ${c.education?.cgpa}</div>
+                <div style="margin-top:0.4rem;">
+                  ${(c.skills || []).map(s => `<span class="skill-tag">${Utils.escapeHTML(s)}</span>`).join('')}
+                </div>
+              </div>
+              <div style="text-align:right;">
+                <span class="badge badge-success" style="font-size:1.1rem; padding:0.5rem 1rem;">${c.matchScore}% Match</span>
+                <div style="margin-top:0.75rem;">
+                  <button class="btn btn-primary" onclick="Utils.showToast('Candidate shortlisted!', 'success')">Shortlist</button>
+                </div>
+              </div>
+            </div>
+          `).join('');
+        }
+      }, 300);
+    });
+  </script>
+</body>
+</html>

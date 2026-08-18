@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Learning Roadmap — AI Engine</title>
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+  <div class="app-container">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <span style="font-size:1.5rem;">🤖</span>
+        <span class="gradient-text" style="font-weight:800;">AI Internship Engine</span>
+      </div>
+      <ul class="sidebar-menu">
+        <li class="menu-item"><a href="student-dashboard.html">📊 Dashboard</a></li>
+        <li class="menu-item"><a href="skill-gap.html">⚡ Skill Gap Analyzer</a></li>
+        <li class="menu-item active"><a href="learning-roadmap.html">📚 Learning Roadmap</a></li>
+      </ul>
+    </aside>
+
+    <main class="main-content">
+      <div class="top-bar">
+        <h1 id="roadmap-title">Skill Learning Roadmap</h1>
+      </div>
+
+      <div id="roadmap-content" class="glass-card">
+        <!-- Rendered via JS -->
+      </div>
+    </main>
+  </div>
+
+  <script src="js/seed-data.js"></script>
+  <script src="js/database.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/skill-engine.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const skill = urlParams.get('skill') || 'Spring Boot';
+
+      const data = window.skillEngine.generateLearningRoadmap(skill);
+      document.getElementById('roadmap-title').textContent = `Target Skill Roadmap: ${data.skillName}`;
+
+      const container = document.getElementById('roadmap-content');
+      container.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
+          <div>
+            <span class="badge badge-accent">${data.category}</span>
+            <span style="margin-left:0.5rem; color:var(--text-secondary); font-size:0.9rem;">Est. Duration: ${data.estimatedHours} Hours</span>
+          </div>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:1.25rem;">
+          ${data.steps.map((step, idx) => `
+            <div style="display:flex; gap:1rem; align-items:flex-start; background:rgba(255,255,255,0.03); padding:1rem; border-radius:var(--radius-md); border-left:4px solid var(--accent-primary);">
+              <div style="width:32px; height:32px; border-radius:50%; background:var(--accent-primary); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700;">${idx+1}</div>
+              <div style="flex:1;">
+                <h4 style="font-size:1.05rem;">${Utils.escapeHTML(step.title)}</h4>
+                <p style="color:var(--text-secondary); font-size:0.9rem; margin-top:0.25rem;">${Utils.escapeHTML(step.task)}</p>
+              </div>
+              <span class="badge badge-info">${step.duration}</span>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    });
+  </script>
+</body>
+</html>

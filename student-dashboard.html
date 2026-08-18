@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Dashboard — AI Internship Engine</title>
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/internship.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <span style="font-size:1.5rem;">🤖</span>
+        <span class="gradient-text" style="font-weight:800; font-size:1.1rem;">AI Internship Engine</span>
+      </div>
+
+      <ul class="sidebar-menu">
+        <li class="menu-item active"><a href="student-dashboard.html">📊 Dashboard</a></li>
+        <li class="menu-item"><a href="internships.html">💼 Internships Marketplace</a></li>
+        <li class="menu-item"><a href="recommendations.html">🎯 AI Recommendation Feed</a></li>
+        <li class="menu-item"><a href="skill-gap.html">⚡ Skill Gap Analyzer</a></li>
+        <li class="menu-item"><a href="career.html">�️ Career Roadmap</a></li>
+        <li class="menu-item"><a href="resume-analyzer.html">📄 Resume Optimizer</a></li>
+        <li class="menu-item"><a href="applications.html">📝 Applications Tracker</a></li>
+        <li class="menu-item"><a href="saved.html">⭐ Saved Internships</a></li>
+        <li class="menu-item"><a href="compare.html">⚖️ Compare Internships</a></li>
+        <li class="menu-item"><a href="interview-prep.html">🎓 AI Interview Prep</a></li>
+        <li class="menu-item"><a href="messages.html">💬 Messages</a></li>
+        <li class="menu-item"><a href="profile.html">👤 Student Profile</a></li>
+      </ul>
+
+      <div style="padding-top:1rem; border-top:1px solid var(--border-color);">
+        <button onclick="authController.logout()" class="btn btn-secondary" style="width:100%;">Logout</button>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <div class="top-bar">
+        <div>
+          <h1 style="font-size:1.8rem;" id="welcome-title">Welcome back, Alex! 👋</h1>
+          <p style="color:var(--text-secondary); font-size:0.9rem;">Here is your personalized AI internship match overview for today.</p>
+        </div>
+
+        <div style="display:flex; gap:1rem; align-items:center;">
+          <select class="lang-select form-select" style="width:auto; padding:0.4rem 0.8rem; font-size:0.85rem;">
+            <option value="en">English (EN)</option>
+            <option value="tn">தமிழ் (TN)</option>
+            <option value="hi">हिन्दी (HI)</option>
+          </select>
+          <button id="btn-notifications" class="btn btn-icon" title="Notifications">🔔</button>
+          <button id="btn-export-data" class="btn btn-icon" title="Export Data">📥</button>
+          <button id="btn-backup-data" class="btn btn-icon" title="Backup Data">💾</button>
+          <button class="theme-toggle-btn btn-icon">🌙</button>
+          <div style="text-align:right;">
+            <div style="font-weight:600; font-size:0.9rem;" id="user-name-display">Alex Chen</div>
+            <div style="font-size:0.75rem; color:var(--accent-cyan);" id="user-role-display">STUDENT</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Metrics Grid -->
+      <div class="metrics-row">
+        <div class="glass-card metric-card">
+          <div style="color:var(--text-secondary); font-size:0.85rem;">Applications Submitted</div>
+          <div class="metric-val" style="color:var(--accent-cyan);">2</div>
+        </div>
+        <div class="glass-card metric-card">
+          <div style="color:var(--text-secondary); font-size:0.85rem;">Shortlisted Candidates</div>
+          <div class="metric-val" style="color:var(--accent-success);">1</div>
+        </div>
+        <div class="glass-card metric-card">
+          <div style="color:var(--text-secondary); font-size:0.85rem;">Upcoming Interviews</div>
+          <div class="metric-val" style="color:var(--accent-warning);">1</div>
+        </div>
+        <div class="glass-card metric-card">
+          <div style="color:var(--text-secondary); font-size:0.85rem;">AI Career Score</div>
+          <div class="metric-val gradient-text">88 / 100</div>
+        </div>
+      </div>
+
+      <!-- Profile Completion & Match Highlights -->
+      <div style="display:grid; grid-template-columns: 2fr 1fr; gap:2rem; margin-bottom:2.5rem;">
+        <div class="glass-card">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+            <h3 style="font-size:1.2rem;">🎯 Top AI Internship Recommendations</h3>
+            <a href="recommendations.html" style="font-size:0.85rem;">View All Feed →</a>
+          </div>
+
+          <div id="dash-recommendations-list" class="internship-list">
+            <!-- Dynamic Render -->
+          </div>
+        </div>
+
+        <div class="glass-card">
+          <h3 style="font-size:1.2rem; margin-bottom:1rem;">📊 Career Growth & Skills</h3>
+          <div style="margin-bottom:1.5rem;">
+            <div style="display:flex; justify-content:space-between; font-size:0.85rem; margin-bottom:0.4rem;">
+              <span>Profile Completion</span>
+              <span>92%</span>
+            </div>
+            <div style="background:rgba(255,255,255,0.1); height:8px; border-radius:4px; overflow:hidden;">
+              <div style="background:var(--accent-primary); width:92%; height:100%;"></div>
+            </div>
+          </div>
+
+          <h4 style="font-size:0.95rem; margin-bottom:0.75rem; color:var(--text-secondary);">Application Funnel Activity</h4>
+          <canvas id="app-analytics-chart" style="width:100%; height:180px;"></canvas>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="js/seed-data.js"></script>
+  <script src="js/database.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/translations.js"></script>
+  <script src="js/aiService.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/recommendation-engine.js"></script>
+  <script src="js/analytics.js"></script>
+  <script src="js/notifications.js"></script>
+  <script src="js/export.js"></script>
+  <script src="js/backup.js"></script>
+  <script src="js/voice-search.js"></script>
+  <script src="js/location.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    // Notifications Feature
+    document.getElementById('btn-notifications').addEventListener('click', async () => {
+      const userId = 'std-1';
+      const notifications = await window.notificationManager.fetchUserNotifications(userId);
+      const unread = notifications.filter(n => !n.read);
+      Utils.showToast(`You have ${unread.length} unread notifications`, 'info');
+    });
+
+    // Export Feature
+    document.getElementById('btn-export-data').addEventListener('click', () => {
+      if (window.exportService) {
+        window.exportService.exportStudentData('std-1');
+      } else {
+        Utils.showToast('Export service not available', 'warning');
+      }
+    });
+
+    // Backup Feature
+    document.getElementById('btn-backup-data').addEventListener('click', () => {
+      if (window.backupManager) {
+        window.backupManager.createBackup();
+      } else {
+        Utils.showToast('Backup service not available', 'warning');
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      setTimeout(async () => {
+        const student = await window.dbManager.get('students', 'std-1');
+        const internships = await window.dbManager.getAll('internships');
+        
+        if (student && internships.length > 0) {
+          const ranked = await window.recommendationEngine.rankInternshipsForStudent(student, internships);
+          const top2 = ranked.slice(0, 2);
+
+          const listEl = document.getElementById('dash-recommendations-list');
+          listEl.innerHTML = top2.map(item => `
+            <div class="glass-card internship-card" style="padding:1rem;">
+              <div class="internship-header">
+                <img src="${item.companyLogo || item.logo || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=150&q=80'}" class="company-logo" alt="Logo" />
+                <div>
+                  <h4 style="font-size:1.05rem;">${Utils.escapeHTML(item.role)}</h4>
+                  <div style="font-size:0.85rem; color:var(--text-secondary);">${Utils.escapeHTML(item.companyName)} • ${Utils.escapeHTML(item.location)} (${item.workMode})</div>
+                  <div style="margin-top:0.4rem;">
+                    ${(item.requiredSkills || []).slice(0,3).map(s => `<span class="skill-tag">${Utils.escapeHTML(s)}</span>`).join('')}
+                  </div>
+                </div>
+              </div>
+              <div style="text-align:right; display:flex; flex-direction:column; justify-content:space-between;">
+                <div class="badge badge-success" style="font-size:0.85rem;">${item.matchScore}% Match</div>
+                <a href="internship-details.html?id=${item.id}" class="btn btn-primary" style="padding:0.4rem 0.8rem; font-size:0.8rem;">Apply Now</a>
+              </div>
+            </div>
+          `).join('');
+        }
+
+        // Render Funnel Chart
+        window.analyticsEngine.renderBarChart('app-analytics-chart', ['Applied', 'Shortlisted', 'Interviews', 'Offers'], [2, 1, 1, 0], '#06b6d4');
+      }, 300);
+    });
+  </script>
+</body>
+</html>

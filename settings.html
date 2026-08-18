@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Settings & DB Backup — AI Engine</title>
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+  <div class="app-container">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <span style="font-size:1.5rem;">⚙️</span>
+        <span class="gradient-text" style="font-weight:800;">Admin Console</span>
+      </div>
+      <ul class="sidebar-menu">
+        <li class="menu-item"><a href="admin-dashboard.html">📊 Overview</a></li>
+        <li class="menu-item"><a href="user-management.html">👥 User Management</a></li>
+        <li class="menu-item"><a href="company-management.html">🏢 Company Verification</a></li>
+        <li class="menu-item"><a href="fraud-monitoring.html">�️ Fraud Monitoring</a></li>
+        <li class="menu-item active"><a href="settings.html">⚙️ Settings & DB Backup</a></li>
+      </ul>
+    </aside>
+
+    <main class="main-content">
+      <div class="top-bar">
+        <h1>System Configuration, Backup & Database Operations</h1>
+      </div>
+
+      <div class="glass-card" style="margin-bottom:2rem;">
+        <h3 style="font-size:1.2rem; margin-bottom:1rem;">💾 Client Database Backup & Restore</h3>
+        <p style="color:var(--text-secondary); font-size:0.9rem; margin-bottom:1.5rem;">
+          Export full IndexedDB (`AIInternshipDB`) 19 object stores into a standalone JSON backup file or restore previously saved data.
+        </p>
+
+        <div style="display:flex; gap:1rem; flex-wrap:wrap; margin-bottom:1.5rem;">
+          <button id="btn-export-json" class="btn btn-primary">📥 Export Complete Database (JSON)</button>
+          <button id="btn-export-csv" class="btn btn-secondary">📊 Export Internships (CSV)</button>
+          <button id="btn-reset-demo" class="btn btn-outline" style="border-color:var(--accent-warning); color:var(--accent-warning);">⚡ Reset Demo Data Defaults</button>
+        </div>
+
+        <div style="border-top:1px solid var(--border-color); padding-top:1.5rem;">
+          <h4 style="font-size:0.95rem; margin-bottom:0.75rem;">Restore Database Backup File:</h4>
+          <input type="file" id="restore-file-input" accept=".json" class="form-input" style="max-width:400px;" />
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="js/seed-data.js"></script>
+  <script src="js/database.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/export.js"></script>
+  <script src="js/backup.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    document.getElementById('btn-export-json').addEventListener('click', () => {
+      window.backupManager.exportFullDatabase();
+    });
+
+    document.getElementById('btn-export-csv').addEventListener('click', async () => {
+      const items = await window.dbManager.getAll('internships');
+      window.DataExporter.downloadCSV(items, 'Internships_Export.csv');
+    });
+
+    document.getElementById('btn-reset-demo').addEventListener('click', () => {
+      window.backupManager.resetDemoData();
+    });
+
+    document.getElementById('restore-file-input').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (evt) => {
+          try {
+            const data = JSON.parse(evt.target.result);
+            window.backupManager.restoreFullDatabase(data);
+          } catch (err) {
+            Utils.showToast('Invalid JSON backup file.', 'error');
+          }
+        };
+        reader.readAsText(file);
+      }
+    });
+  </script>
+</body>
+</html>

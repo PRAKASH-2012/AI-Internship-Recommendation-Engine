@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Company Dashboard — AI Engine</title>
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/internship.css">
+</head>
+<body>
+  <div class="app-container">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <span style="font-size:1.5rem;">🏢</span>
+        <span class="gradient-text" style="font-weight:800;">Recruiter Portal</span>
+      </div>
+      <ul class="sidebar-menu">
+        <li class="menu-item active"><a href="company-dashboard.html">📊 Dashboard</a></li>
+        <li class="menu-item"><a href="post-internship.html">➕ Post Internship</a></li>
+        <li class="menu-item"><a href="candidates.html">🎯 AI Candidate Ranking</a></li>
+        <li class="menu-item"><a href="interviews.html">📅 Schedule Interviews</a></li>
+        <li class="menu-item"><a href="fraud-monitoring.html">🛡️ Fraud Detection</a></li>
+        <li class="menu-item"><a href="messages.html">💬 Messages</a></li>
+        <li class="menu-item"><a href="company-profile.html">🏢 Company Profile</a></li>
+      </ul>
+      <div style="padding-top:1rem; border-top:1px solid var(--border-color);">
+        <button onclick="authController.logout()" class="btn btn-secondary" style="width:100%;">Logout</button>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <div class="top-bar">
+        <div>
+          <h1>Company Recruiter Hub</h1>
+          <p style="color:var(--text-secondary); font-size:0.9rem;">TechPulse Labs • Verified Enterprise Employer</p>
+        </div>
+        <div style="display:flex; gap:1rem; align-items:center;">
+          <button id="btn-notifications" class="btn btn-icon" title="Notifications">🔔</button>
+          <button id="btn-export-data" class="btn btn-icon" title="Export Data">📥</button>
+          <button id="btn-backup-data" class="btn btn-icon" title="Backup Data">💾</button>
+          <a href="post-internship.html" class="btn btn-primary">➕ Post New Internship</a>
+        </div>
+      </div>
+
+      <div class="metrics-row">
+        <div class="glass-card metric-card">
+          <div style="color:var(--text-secondary); font-size:0.85rem;">Active Postings</div>
+          <div class="metric-val" style="color:var(--accent-cyan);">1</div>
+        </div>
+        <div class="glass-card metric-card">
+          <div style="color:var(--text-secondary); font-size:0.85rem;">Total Applicants</div>
+          <div class="metric-val" style="color:var(--accent-success);">2</div>
+        </div>
+        <div class="glass-card metric-card">
+          <div style="color:var(--text-secondary); font-size:0.85rem;">Company Trust Score</div>
+          <div class="metric-val gradient-text">96 / 100</div>
+        </div>
+        <div class="glass-card metric-card">
+          <div style="color:var(--text-secondary); font-size:0.85rem;">🛡️ Fraud Risk Level</div>
+          <div class="metric-val" style="color:var(--accent-success);">Low Risk</div>
+        </div>
+      </div>
+
+      <div class="glass-card">
+        <h3 style="font-size:1.2rem; margin-bottom:1rem;">Your Active Internship Listings</h3>
+        <div id="company-listings-container">
+          <!-- Rendered via JS -->
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="js/seed-data.js"></script>
+  <script src="js/database.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/notifications.js"></script>
+  <script src="js/export.js"></script>
+  <script src="js/backup.js"></script>
+  <script src="js/fraud-detection.js"></script>
+  <script src="js/analytics.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    // Notifications Feature
+    document.getElementById('btn-notifications').addEventListener('click', async () => {
+      const companyId = 'cmp-1';
+      const notifications = await window.notificationManager.fetchUserNotifications(companyId);
+      const unread = notifications.filter(n => !n.read);
+      Utils.showToast(`You have ${unread.length} unread notifications`, 'info');
+    });
+
+    // Export Feature
+    document.getElementById('btn-export-data').addEventListener('click', () => {
+      if (window.exportService) {
+        window.exportService.exportCompanyData('cmp-1');
+      } else {
+        Utils.showToast('Export service not available', 'warning');
+      }
+    });
+
+    // Backup Feature
+    document.getElementById('btn-backup-data').addEventListener('click', () => {
+      if (window.backupManager) {
+        window.backupManager.createBackup();
+      } else {
+        Utils.showToast('Backup service not available', 'warning');
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      setTimeout(async () => {
+        const listings = await window.dbManager.filter('internships', i => i.companyId === 'cmp-1');
+        const container = document.getElementById('company-listings-container');
+
+        container.innerHTML = listings.map(item => `
+          <div class="glass-card internship-card" style="padding:1rem;">
+            <div>
+              <h4 style="font-size:1.1rem;">${Utils.escapeHTML(item.role)}</h4>
+              <div style="color:var(--text-secondary); font-size:0.88rem;">${item.location} • ${item.stipend}</div>
+            </div>
+            <div style="display:flex; gap:0.5rem; align-items:center;">
+              <a href="candidates.html?id=${item.id}" class="btn btn-primary" style="padding:0.4rem 0.8rem; font-size:0.85rem;">Rank Candidates</a>
+            </div>
+          </div>
+        `).join('');
+      }, 300);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Internship Details — AI Recommendation Engine</title>
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/internship.css">
+</head>
+<body>
+  <div class="app-container">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <span style="font-size:1.5rem;">🤖</span>
+        <span class="gradient-text" style="font-weight:800;">AI Internship Engine</span>
+      </div>
+      <ul class="sidebar-menu">
+        <li class="menu-item"><a href="student-dashboard.html">📊 Dashboard</a></li>
+        <li class="menu-item"><a href="internships.html">💼 Internships Marketplace</a></li>
+        <li class="menu-item"><a href="recommendations.html">🎯 AI Feed</a></li>
+        <li class="menu-item"><a href="skill-gap.html">⚡ Skill Gap Analyzer</a></li>
+      </ul>
+    </aside>
+
+    <main class="main-content">
+      <div style="margin-bottom:1.5rem;">
+        <a href="internships.html" style="font-size:0.9rem;">← Back to Marketplace</a>
+      </div>
+
+      <div id="details-container">
+        <!-- Rendered via JS -->
+      </div>
+    </main>
+  </div>
+
+  <script src="js/seed-data.js"></script>
+  <script src="js/database.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/recommendation-engine.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const intId = urlParams.get('id') || 'int-101';
+
+      setTimeout(async () => {
+        const student = await window.dbManager.get('students', 'std-1');
+        const item = await window.dbManager.get('internships', intId);
+
+        if (item && student) {
+          const match = window.recommendationEngine.calculateMatch(student, item);
+          const container = document.getElementById('details-container');
+
+          container.innerHTML = `
+            <div class="glass-card" style="margin-bottom:2rem;">
+              <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                <div style="display:flex; gap:1.5rem;">
+                  <img src="${item.companyLogo || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=150&q=80'}" class="company-logo" style="width:70px; height:70px;" alt="Logo" />
+                  <div>
+                    <h1 style="font-size:1.8rem;">${Utils.escapeHTML(item.role)}</h1>
+                    <div style="color:var(--text-secondary); font-size:1rem; margin-top:0.3rem;">
+                      ${Utils.escapeHTML(item.companyName)} • ${Utils.escapeHTML(item.location)} (${item.workMode})
+                    </div>
+                  </div>
+                </div>
+                <div class="match-badge-large" style="width:100px; height:100px;">
+                  <span class="match-pct" style="font-size:2.2rem;">${match.matchScore}%</span>
+                  <span style="font-size:0.75rem; color:var(--text-muted);">MATCH SCORE</span>
+                </div>
+              </div>
+
+              <div style="display:flex; gap:1rem; margin-top:1.5rem;">
+                <button id="btn-submit-app" class="btn btn-primary" style="padding:0.75rem 2rem;">Apply Now</button>
+                <button id="btn-save-int" class="btn btn-secondary">⭐ Save Internship</button>
+              </div>
+            </div>
+
+            <!-- Transparent Recommendation Explanation Card -->
+            <div class="glass-card" style="margin-bottom:2rem; border-color:var(--border-accent);">
+              <h3 style="font-size:1.2rem; color:var(--accent-cyan); margin-bottom:1rem;">🤖 Why did AI recommend this internship?</h3>
+              <div style="display:flex; flex-direction:column; gap:0.6rem; font-size:0.95rem;">
+                ${match.why.map(reason => `<div>${Utils.escapeHTML(reason)}</div>`).join('')}
+              </div>
+            </div>
+
+            <div class="glass-card">
+              <h3 style="font-size:1.3rem; margin-bottom:1rem;">Role Description & Responsibilities</h3>
+              <p style="color:var(--text-secondary); margin-bottom:1.5rem;">${Utils.escapeHTML(item.description)}</p>
+
+              <h4 style="font-size:1rem; margin-bottom:0.5rem;">Key Responsibilities:</h4>
+              <ul style="color:var(--text-secondary); padding-left:1.2rem; margin-bottom:1.5rem;">
+                ${(item.responsibilities || []).map(r => `<li>${Utils.escapeHTML(r)}</li>`).join('')}
+              </ul>
+
+              <h4 style="font-size:1rem; margin-bottom:0.5rem;">Required Skills:</h4>
+              <div style="margin-bottom:1.5rem;">
+                ${(item.requiredSkills || []).map(s => `<span class="skill-tag" style="font-size:0.85rem; padding:0.3rem 0.8rem;">${Utils.escapeHTML(s)}</span>`).join('')}
+              </div>
+            </div>
+          `;
+
+          document.getElementById('btn-submit-app').addEventListener('click', async () => {
+            const app = {
+              id: Utils.generateId('app'),
+              studentId: 'std-1',
+              internshipId: item.id,
+              companyName: item.companyName,
+              role: item.role,
+              status: 'Applied',
+              appliedDate: new Date().toISOString().slice(0,10),
+              timeline: [{ status: 'Applied', date: new Date().toISOString().slice(0,10), note: 'Submitted via AI Platform' }]
+            };
+            await window.dbManager.put('applications', app);
+            Utils.showToast('Application submitted successfully!', 'success');
+            setTimeout(() => window.location.href = 'applications.html', 1000);
+          });
+
+          document.getElementById('btn-save-int').addEventListener('click', async () => {
+            await window.dbManager.put('savedInternships', { studentId: 'std-1', internshipId: item.id, savedAt: new Date().toISOString() });
+            Utils.showToast('Saved to your bookmarks!', 'success');
+          });
+        }
+      }, 300);
+    });
+  </script>
+</body>
+</html>

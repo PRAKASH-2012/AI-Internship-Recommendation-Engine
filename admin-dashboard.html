@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard — AI Internship Engine</title>
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+  <div class="app-container">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <span style="font-size:1.5rem;">⚙️</span>
+        <span class="gradient-text" style="font-weight:800;">Admin Console</span>
+      </div>
+      <ul class="sidebar-menu">
+        <li class="menu-item active"><a href="admin-dashboard.html">📊 Overview</a></li>
+        <li class="menu-item"><a href="user-management.html">👥 User Management</a></li>
+        <li class="menu-item"><a href="company-management.html">🏢 Company Verification</a></li>
+        <li class="menu-item"><a href="internship-management.html">💼 Listing Moderation</a></li>
+        <li class="menu-item"><a href="fraud-monitoring.html">🛡️ Fraud Monitoring</a></li>
+        <li class="menu-item"><a href="analytics.html">📈 Platform Analytics</a></li>
+        <li class="menu-item"><a href="settings.html">⚙️ Settings & DB Backup</a></li>
+      </ul>
+      <div style="padding-top:1rem; border-top:1px solid var(--border-color);">
+        <button onclick="authController.logout()" class="btn btn-secondary" style="width:100%;">Logout</button>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <div class="top-bar">
+        <h1>Platform System Overview</h1>
+        <div style="display:flex; gap:0.5rem;">
+          <button id="btn-export-admin" class="btn btn-secondary">📥 Export Report</button>
+          <button id="btn-backup-admin" class="btn btn-secondary">💾 Backup DB</button>
+        </div>
+      </div>
+
+      <div class="metrics-row">
+        <div class="glass-card metric-card">
+          <div style="color:var(--text-secondary); font-size:0.85rem;">Total Registered Students</div>
+          <div class="metric-val" style="color:var(--accent-cyan);">30</div>
+        </div>
+        <div class="glass-card metric-card">
+          <div style="color:var(--text-secondary); font-size:0.85rem;">Verified Employers</div>
+          <div class="metric-val" style="color:var(--accent-success);">15</div>
+        </div>
+        <div class="glass-card metric-card">
+          <div style="color:var(--text-secondary); font-size:0.85rem;">Active Internships</div>
+          <div class="metric-val" style="color:var(--accent-warning);">50</div>
+        </div>
+        <div class="glass-card metric-card">
+          <div style="color:var(--text-secondary); font-size:0.85rem;">Flagged Scam Listings</div>
+          <div class="metric-val" style="color:var(--accent-error);">1</div>
+        </div>
+      </div>
+
+      <div class="glass-card" style="margin-bottom:2rem;">
+        <h3 style="font-size:1.2rem; margin-bottom:1rem; color:var(--accent-warning);">🛡️ Pending Fraud Audit Queue</h3>
+        <table style="width:100%; border-collapse:collapse; text-align:left;">
+          <thead>
+            <tr style="border-bottom:1px solid var(--border-color); color:var(--text-muted);">
+              <th style="padding:0.75rem;">Company</th>
+              <th style="padding:0.75rem;">Role Title</th>
+              <th style="padding:0.75rem;">Risk Score</th>
+              <th style="padding:0.75rem;">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="padding:0.75rem;">QuickHire Global</td>
+              <td style="padding:0.75rem;">Data Entry ($10,000/mo - Fee Required)</td>
+              <td style="padding:0.75rem;"><span class="badge badge-error">88% High Risk</span></td>
+              <td style="padding:0.75rem;">
+                <a href="fraud-monitoring.html" class="btn btn-primary" style="padding:0.3rem 0.7rem; font-size:0.8rem;">Review Listing</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+
+  <script src="js/seed-data.js"></script>
+  <script src="js/database.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/fraud-detection.js"></script>
+  <script src="js/analytics.js"></script>
+  <script src="js/export.js"></script>
+  <script src="js/backup.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    // Export Admin Report
+    document.getElementById('btn-export-admin').addEventListener('click', () => {
+      if (window.exportService) {
+        const report = {
+          generatedAt: new Date().toISOString(),
+          students: 30,
+          employers: 15,
+          internships: 50,
+          fraudFlags: 1
+        };
+        const blob = new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `admin-report-${Date.now()}.json`;
+        a.click();
+        Utils.showToast('Admin report exported!', 'success');
+      }
+    });
+
+    // Backup Database
+    document.getElementById('btn-backup-admin').addEventListener('click', () => {
+      if (window.backupManager) {
+        window.backupManager.createBackup();
+        Utils.showToast('Database backup completed!', 'success');
+      }
+    });
+  </script>
+
+  <script src="js/seed-data.js"></script>
+  <script src="js/database.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Internships Marketplace — AI Recommendation Engine</title>
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/internship.css">
+</head>
+<body>
+  <div class="app-container">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <span style="font-size:1.5rem;">🤖</span>
+        <span class="gradient-text" style="font-weight:800;">AI Internship Engine</span>
+      </div>
+      <ul class="sidebar-menu">
+        <li class="menu-item"><a href="student-dashboard.html">📊 Dashboard</a></li>
+        <li class="menu-item active"><a href="internships.html">💼 Internships Marketplace</a></li>
+        <li class="menu-item"><a href="recommendations.html">🎯 AI Recommendation Feed</a></li>
+        <li class="menu-item"><a href="skill-gap.html">⚡ Skill Gap Analyzer</a></li>
+        <li class="menu-item"><a href="career.html">�️ Career Roadmap</a></li>
+        <li class="menu-item"><a href="resume-analyzer.html">📄 Resume Optimizer</a></li>
+        <li class="menu-item"><a href="applications.html">📝 Applications Tracker</a></li>
+        <li class="menu-item"><a href="saved.html">⭐ Saved Internships</a></li>
+        <li class="menu-item"><a href="compare.html">⚖️ Compare Internships</a></li>
+      </ul>
+    </aside>
+
+    <main class="main-content">
+      <div class="top-bar">
+        <h1>Internships Marketplace</h1>
+        <div style="display:flex; gap:0.5rem;">
+          <button id="btn-voice-search" class="btn btn-secondary">🎙 Voice Search</button>
+          <button id="btn-geo-location" class="btn btn-outline">📍 Nearby Internships</button>
+        </div>
+      </div>
+
+      <!-- Search Bar -->
+      <div class="glass-card" style="margin-bottom:1.5rem; padding:1rem;">
+        <div style="display:flex; gap:1rem;">
+          <input type="text" id="search-input" class="form-input" placeholder="Search by role, company, or required skill (e.g. Java, Python, Remote)..." />
+          <button id="btn-search-trigger" class="btn btn-primary">Search</button>
+        </div>
+      </div>
+
+      <div class="marketplace-layout">
+        <!-- Filter Panel -->
+        <aside class="glass-card filter-panel">
+          <h3 style="font-size:1.1rem; margin-bottom:1rem;">Filter Opportunities</h3>
+
+          <div class="filter-group">
+            <div class="filter-title">Work Mode</div>
+            <label style="display:block; font-size:0.88rem; margin-bottom:0.4rem;">
+              <input type="checkbox" class="filter-workmode" value="Remote" checked /> Remote
+            </label>
+            <label style="display:block; font-size:0.88rem; margin-bottom:0.4rem;">
+              <input type="checkbox" class="filter-workmode" value="Hybrid" checked /> Hybrid
+            </label>
+            <label style="display:block; font-size:0.88rem;">
+              <input type="checkbox" class="filter-workmode" value="Onsite" checked /> Onsite
+            </label>
+          </div>
+
+          <div class="filter-group">
+            <div class="filter-title">Minimum Stipend</div>
+            <select id="filter-stipend" class="form-select">
+              <option value="0">All Stipends</option>
+              <option value="2000">$2,000+ / month</option>
+              <option value="2500">$2,500+ / month</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <div class="filter-title">Location Preference</div>
+            <select id="filter-location" class="form-select">
+              <option value="">All Locations</option>
+              <option value="San Francisco">San Francisco, CA</option>
+              <option value="New York">New York, NY</option>
+              <option value="Seattle">Seattle, WA</option>
+              <option value="Austin">Austin, TX</option>
+              <option value="Remote">Remote Anywhere</option>
+            </select>
+          </div>
+
+          <button id="btn-reset-filters" class="btn btn-secondary" style="width:100%;">Reset Filters</button>
+        </aside>
+
+        <!-- Internship Cards List -->
+        <div id="marketplace-list" class="internship-list">
+          <!-- Rendered via JS -->
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="js/seed-data.js"></script>
+  <script src="js/database.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/voice-search.js"></script>
+  <script src="js/location.js"></script>
+  <script src="js/recommendation-engine.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      setTimeout(async () => {
+        const student = await window.dbManager.get('students', 'std-1');
+        const internships = await window.dbManager.getAll('internships');
+        renderInternships(student, internships);
+
+        // Voice Search Trigger
+        document.getElementById('btn-voice-search').addEventListener('click', () => {
+          window.voiceSearch.startListening(term => {
+            document.getElementById('search-input').value = term;
+            filterAndRender(student, internships);
+          });
+        });
+
+        // Search button click
+        document.getElementById('btn-search-trigger').addEventListener('click', () => filterAndRender(student, internships));
+      }, 300);
+    });
+
+    async function renderInternships(student, items) {
+      const ranked = await window.recommendationEngine.rankInternshipsForStudent(student, items);
+      const container = document.getElementById('marketplace-list');
+
+      container.innerHTML = ranked.map(item => `
+        <div class="glass-card internship-card">
+          <div style="display:flex; gap:1.25rem;">
+            <img src="${item.companyLogo || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=150&q=80'}" class="company-logo" alt="Logo" />
+            <div>
+              <h3 style="font-size:1.2rem;">${Utils.escapeHTML(item.role)}</h3>
+              <div style="color:var(--text-secondary); font-size:0.9rem; margin-bottom:0.5rem;">
+                ${Utils.escapeHTML(item.companyName)} • ${Utils.escapeHTML(item.location)} 
+                <span class="badge badge-info" style="margin-left:0.5rem;">${item.workMode}</span>
+              </div>
+              <div style="font-weight:600; color:var(--accent-cyan); font-size:0.95rem; margin-bottom:0.5rem;">
+                ${item.stipend} • ${item.duration}
+              </div>
+              <div>
+                ${(item.requiredSkills || []).map(s => `<span class="skill-tag">${Utils.escapeHTML(s)}</span>`).join('')}
+              </div>
+            </div>
+          </div>
+
+          <div style="display:flex; flex-direction:column; align-items:flex-end; justify-content:space-between;">
+            <div class="match-badge-large">
+              <span class="match-pct">${item.matchScore}%</span>
+              <span style="font-size:0.7rem; color:var(--text-muted);">AI MATCH</span>
+            </div>
+            <a href="internship-details.html?id=${item.id}" class="btn btn-primary">Apply Now</a>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    async function filterAndRender(student, items) {
+      const query = document.getElementById('search-input').value.toLowerCase();
+      const minStipend = parseInt(document.getElementById('filter-stipend').value) || 0;
+
+      const filtered = items.filter(item => {
+        const matchesQuery = !query || 
+          item.role.toLowerCase().includes(query) || 
+          item.companyName.toLowerCase().includes(query) || 
+          (item.requiredSkills || []).some(s => s.toLowerCase().includes(query));
+        const matchesStipend = (item.stipendNumeric || 0) >= minStipend;
+        return matchesQuery && matchesStipend;
+      });
+
+      renderInternships(student, filtered);
+    }
+  </script>
+</body>
+</html>
